@@ -1,0 +1,74 @@
+#### README ####
+#
+# This action "tests" your AutoPKG JSS recipes by running them on a macOS machine and uploading them to your JAMF instance via JSSImporter
+# I recommend using a sandbox/dev instance for this, which your JAMF rep will happily provide for you on request.
+#
+#### REQUIREMENTS ####
+# 
+# The below action assumes that your repository contains a RecipeOverrides folder at its root that contains your overrides
+# It also assumes you have a file called repo_list.txt in the root of your repository which lists the parent repositories used by your recipes.
+#
+# This action also references (3) Github repository secrets:
+# - JSS_USERNAME
+# - JSS_PASSWORD
+# - JSS_URL
+#
+# I HIGHLY RECOMMEND USING A JAMF SANDBOX/DEV ENVIRONMENT
+#
+####
+
+name: AutoPkg Recipe Test
+
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  AutoPkg:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+    - name: Checkout it-autopkg
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
+
+    - name: Set env variables
+      run: |
+        echo "NEW_RECIPES="$(git diff --name-only origin/main | grep ".*\.recipe$" | sort -u)"" >> $GITHUB_ENV
+
+    - name: Install AutoPkg
+      run: |
+        curl -L https://github.com/autopkg/autopkg/releases/download/v2.1/autopkg-2.1.pkg --output /tmp/autopkg.pkg
+        sudo installer -pkg /tmp/autopkg.pkg -target /
+
+    - name: Install JSSImporter
+      run: |
+        curl -L https://github.com/jssimporter/JSSImporter/releases/download/v1.1.2/jssimporter-1.1.2.pkg --output /tmp/jssimporter.pkg
+        sudo installer -pkg /tmp/jssimporter.pkg -target /
+
+    - name: Configure AutoPkg
+      env:
+        JSS_USERNAME: ${{ secrets.JSS_USERNAME }}
+        JSS_PASSWORD: ${{ secrets.JSS_PASSWORD }}
+        JSS_URL: ${{ secrets.JSS_URL }}
+      run: |
+        defaults write com.github.autopkg RECIPE_OVERRIDE_DIRS $(pwd)/RecipeOverrides/
+        defaults write com.github.autopkg RECIPE_REPO_DIR $(pwd)/repos/
+        defaults write com.github.autopkg FAIL_RECIPES_WITHOUT_TRUST_INFO -bool YES
+        defaults write com.github.autopkg JSS_URL $JSS_URL
+        defaults write com.github.autopkg API_USERNAME $JSS_USERNAME
+        defaults write com.github.autopkg API_PASSWORD $JSS_PASSWORD
+
+    - name: Clone AutoPkg parent repos
+      run: |
+        for repo in $(cat repo_list.txt); do autopkg repo-add $repo && autopkg repo-update $repo; done
+
+    - name: Verify trust info
+      run: |
+        for recipe in "$NEW_RECIPES"; do autopkg verify-trust-info -vv $recipe; done
+    
+    - name: Run recipes
+      run: |
+        for recipe in "$NEW_RECIPES"; do autopkg run -vv $recipe --key STOP_IF_NO_JSS_UPLOAD=False; done
+
