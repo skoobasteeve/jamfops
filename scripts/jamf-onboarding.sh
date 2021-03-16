@@ -10,7 +10,7 @@
 #
 #### REQUIREMENTS ####
 #
-# * Corresponding Extension Attribute that locates the temp file (https://github.com/skoobasteeve/jamfops/ext-attributes/onboarding-group-name.sh)
+# * Corresponding Extension Attribute that locates the temp file (https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh)
 # * Smart Computer Groups in JAMF that add computers with the corresponding extension attribute.
 #
 # DON'T FORGET TO EDIT THE GROUP LIST ON LINE 35
