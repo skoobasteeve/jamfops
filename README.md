@@ -1,5 +1,5 @@
 # JamfOps
-## Useful scripts and workflows to help automate your JAMF environment
+### Useful scripts and workflows to help automate your JAMF environment
 
 <br>
 
