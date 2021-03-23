@@ -4,6 +4,8 @@
 * [New hire onboarding with "low-touch" deployment](#new-hire-onboarding-with-low-touch-deployment)
 * [Miscellaneous scripts and extension attributes](#miscellaneous-scripts-and-extension-attributes)
 
+<br>
+
 ## Automate package updates with AutoPkg
 The below diagram is an overview of how the files in this repo, combined with other incredible open source tools (Git, [AutoPkg](https://github.com/autopkg/autopkg), [AutoPkgr](https://github.com/lindegroup/autopkgr), [JSSImporter](https://github.com/jssimporter/JSSImporter), can help you implement basic automation and GitOps workflows to your JAMF package deployments.
 
