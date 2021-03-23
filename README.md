@@ -1,7 +1,7 @@
 # JamfOps
 ### Useful scripts and workflows to help automate your JAMF environment
-* [Automate package updates with AutoPkg](https://github.com/skoobasteeve/jamfops/blob/readme-diagram-updates/README.md#automate-package-updates-with-autopkg)
-* [New hire onboarding with "low-touch" deployment](https://github.com/skoobasteeve/jamfops/tree/readme-diagram-updates#new-hire-onboarding-with-low-touch-deployment)
+* [Automate package updates with AutoPkg](#automate-package-updates-with-autopkg)
+* [New hire onboarding with "low-touch" deployment](#new-hire-onboarding-with-low-touch-deployment)
 <br>
 
 ## Automate package updates with AutoPkg
