@@ -33,10 +33,10 @@ While the much-praised concept of Zero-touch Deployment is great in theory, ther
 ### Order of operations
 1. Unbox computer and create user
 2. Enroll computer in JAMF if not already done via Automated Enrollment
-3. Run [script](https://github.com/skoobasteeve/jamfops/blob/main/scripts/jamf-onboarding.sh) via Self Service or automatically via enrollment policy
+3. Run script via Self Service or automatically via enrollment policy ([script](https://github.com/skoobasteeve/jamfops/blob/main/scripts/jamf-onboarding.sh))
 4. Enter email of user to assign them
 5. Choose group to assign computer, usually based on department/team
-6. Group is populated via [extension attribute](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh) + corresponding Smart Group
+6. Group is populated via extension attribute + corresponding Smart Group ([extension attribute](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh))
 
 ### Requriements
 1. Physical or remote access to new computer
