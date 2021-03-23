@@ -41,6 +41,6 @@ While the much-praised concept of Zero-touch Deployment is great in theory, ther
 ### Requriements
 1. Physical or remote access to new computer
 2. [jamf-onboarding](https://github.com/skoobasteeve/jamfops/blob/main/scripts/jamf-onboarding.sh) script added to JAMF and customized with your own group names
-3. [onboarding-group-name](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh)extension attribute added to your JAMF environment
+3. [onboarding-group-name](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh) extension attribute added to your JAMF environment
 4. Smart Groups created in JAMF that correspond to group names from previous step
 5. Policies scoped to those Smart Groups
