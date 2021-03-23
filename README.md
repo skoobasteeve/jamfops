@@ -1,6 +1,8 @@
 # JamfOps
 ## Useful scripts and workflows to help automate your JAMF environment
 
+<br>
+
 ## Automate package updates with AutoPkg
 The below diagram is an overview of how the files in this repo, combined with other incredible open source tools (Git, [AutoPkg](https://github.com/autopkg/autopkg), [AutoPkgr](https://github.com/lindegroup/autopkgr), [JSSImporter](https://github.com/jssimporter/JSSImporter), can help you implement basic automation and GitOps workflows to your JAMF package deployments.
 
@@ -23,12 +25,16 @@ The below diagram is an overview of how the files in this repo, combined with ot
 6. Slack instance with Incoming Webhooks installed (for notifications)
 7. Files in this repo
 
+<br>
+
 ## New hire onboarding with "low-touch" deployment
 
 While the much-praised concept of Zero-touch Deployment is great in theory, there are many practical reasons why an organization might choose a more traditional manual approach. The [jamf-onboarding](https://github.com/skoobasteeve/jamfops/blob/main/scripts/jamf-onboarding.sh) script and [onboarding-group-name](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh) extension attribute in this repo allows technicians to easily:
 
 1. Assign a computer to a JAMF user
 2. Place the computer in a specific "onboarding group" and run policies scoped to that group
+
+![onboard_script](https://user-images.githubusercontent.com/36998292/112203212-aad9b500-8be8-11eb-9415-45a7ae1f5b19.gif)
 
 ### Order of operations
 1. Unbox computer and create user
@@ -38,7 +44,7 @@ While the much-praised concept of Zero-touch Deployment is great in theory, ther
 5. Choose group to assign computer, usually based on department/team
 6. Group is populated via extension attribute + corresponding Smart Group ([extension attribute](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh))
 
-### Requriements
+### Requirements
 1. Physical or remote access to new computer
 2. [jamf-onboarding](https://github.com/skoobasteeve/jamfops/blob/main/scripts/jamf-onboarding.sh) script added to JAMF and customized with your own group names
 3. [onboarding-group-name](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh) extension attribute added to your JAMF environment
