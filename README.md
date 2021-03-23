@@ -2,7 +2,7 @@
 ### Useful scripts and workflows to help automate your JAMF environment
 * [Automate package updates with AutoPkg](#automate-package-updates-with-autopkg)
 * [New hire onboarding with "low-touch" deployment](#new-hire-onboarding-with-low-touch-deployment)
-<br>
+* [Miscellaneous scripts and extension attributes](#miscellaneous-scripts-and-extension-attributes)
 
 ## Automate package updates with AutoPkg
 The below diagram is an overview of how the files in this repo, combined with other incredible open source tools (Git, [AutoPkg](https://github.com/autopkg/autopkg), [AutoPkgr](https://github.com/lindegroup/autopkgr), [JSSImporter](https://github.com/jssimporter/JSSImporter), can help you implement basic automation and GitOps workflows to your JAMF package deployments.
@@ -51,3 +51,15 @@ While the much-praised concept of Zero-touch Deployment is great in theory, ther
 3. [onboarding-group-name](https://github.com/skoobasteeve/jamfops/blob/main/ext-attributes/onboarding-group-name.sh) extension attribute added to your JAMF environment
 4. Smart Groups created in JAMF that correspond to group names from previous step
 5. Policies scoped to those Smart Groups
+
+<br>
+
+## Miscellaneous scripts and extension attributes
+
+**Scripts**
+* [jamf-app-usage.py](https://github.com/skoobasteeve/jamfops/blob/readme-diagram-updates/scripts/jamf-app-usage.py) - Pulls individual app usage for a specified date range via the JAMF API and exports it as a CSV.
+* [jamf-migrate-groups.sh](https://github.com/skoobasteeve/jamfops/blob/readme-diagram-updates/scripts/jamf-migrate-groups.sh) - Migrates groups from one JAMF instance to another via the API. Useful when setting up a sandbox environment or migrating to another domain.
+
+**Extension attributes**
+* [vm-images.sh](https://github.com/skoobasteeve/jamfops/blob/readme-diagram-updates/ext-attributes/vm-images.sh) - Displays all VM disks on a system with their size in GB.
+* [cert-getexpiration.sh](https://github.com/skoobasteeve/jamfops/blob/readme-diagram-updates/ext-attributes/cert-getexpiration.sh) - Displays remaining days before expiration of a given certificate. If there is more than one certificate with the same common name, it displays the most recent.
