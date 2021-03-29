@@ -61,7 +61,7 @@ update_recipe_list() {
 # Updates parent recipe repos for any new or modified recipes
 update_recipe_repos() {
 
-    modified_recipes="$(find "$HOME/Github/it-autopkg/RecipeOverrides" -type f -name "*.recipe" -mtime -30s)"
+    modified_recipes="$(find "$overrides_folder" -type f -name "*.recipe" -mtime -30s)"
     recipe_owners=()
     recipe_repos=()
 
@@ -114,7 +114,7 @@ slack_removed_recipes() {
 # Gets any existing recipes that were modified and sends them to #autopkg-alerts in Slack
 slack_modified_recipes() {
 
-    modified_recipes="$(find "$HOME/Github/it-autopkg/RecipeOverrides" -type f -name "*.recipe" -mtime -30s)"
+    modified_recipes="$(find "$overrides_folder" -type f -name "*.recipe" -mtime -30s)"
     modified_recipe_list=()
 
     for modified_recipe in $modified_recipes; do
