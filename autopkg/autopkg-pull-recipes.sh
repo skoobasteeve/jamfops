@@ -58,6 +58,35 @@ update_recipe_list() {
 
 }
 
+# Updates parent recipe repos for any new or modified recipes
+update_recipe_repos() {
+
+    modified_recipes="$(find "$HOME/Github/it-autopkg/RecipeOverrides" -type f -name "*.recipe" -mtime -30s)"
+    recipe_owners=()
+    recipe_repos=()
+
+    for modified_recipe in $modified_recipes; do
+        recipe_owner=$(/usr/libexec/PlistBuddy -c "Print :ParentRecipeTrustInfo:parent_recipes:" "$modified_recipe" | grep "= Dict {" | cut -c 16- | cut -f1 -d".")
+        recipe_owners+=("$recipe_owner")
+    done
+    
+    for owner in ${recipe_owners[*]}; do
+        recipe_repo=$(autopkg list-repos | awk -F '[()]' '{print $2}' | grep --ignore-case "$owner")
+        if [ -z "$recipe_repo" ]; then
+            autopkg repo-add https://github.com/autopkg/"$owner"-recipes.git
+        fi
+            
+        if [[ ! ${recipe_repos[*]} =~ ${recipe_repo} ]]; then
+            recipe_repos+=("$recipe_repo")
+        fi
+    done
+
+    for repo in ${recipe_repos[*]}; do
+        autopkg repo-update "$repo"
+    done
+
+} 
+
 # Gets any new recipes added to the list and sends them to #autopkg-alerts in Slack
 slack_new_recipes() {
 
@@ -85,7 +114,7 @@ slack_removed_recipes() {
 # Gets any existing recipes that were modified and sends them to #autopkg-alerts in Slack
 slack_modified_recipes() {
 
-    modified_recipes="$(find "$HOME/Github/it-autopkg/RecipeOverrides" -type f -name "*.recipe" -mtime -10s)"
+    modified_recipes="$(find "$HOME/Github/it-autopkg/RecipeOverrides" -type f -name "*.recipe" -mtime -30s)"
     modified_recipe_list=()
 
     for modified_recipe in $modified_recipes; do
@@ -112,11 +141,13 @@ if [ -f "$recipe_list_file" ]; then
     cp "$recipe_list_file" "$recipe_list_file_old"
     rm "$recipe_list_file" 
     update_recipe_list
+    update_recipe_repos
     slack_new_recipes
     slack_removed_recipes
     slack_modified_recipes
 elif [ ! -f "$recipe_list_file" ]; then
     update_recipe_list
+    update_recipe_repos
     recipe_list="$(cat "$recipe_list_file")"
     curl -X POST "$slack_webhook_url" -H "Content-type: application/json" --data \
     '{"type": "mrkdwn", "text": "*A new recipe list was created on AutoPkgr Prod with the following recipes:*\n\n'"$recipe_list"'"}'
