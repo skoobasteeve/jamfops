@@ -23,35 +23,61 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'RecipeOverrides/**'
 jobs:
   AutoPkg:
     runs-on: macos-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
     - name: Checkout it-autopkg
       uses: actions/checkout@v2
       with:
           fetch-depth: 0
-
-    - name: Set env variables
+    - name: Get file changes
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          recipes:
+            - 'RecipeOverrides/**.recipe'
+          templates:
+            - 'RecipeOverrides/**.xml'
+    - name: List new recipes in temp file
+      if: steps.filter.outputs.recipes == 'true'
       run: |
-        echo "NEW_RECIPES="$(git diff --name-only origin/main | grep ".*\.recipe$" | sort -u)"" >> $GITHUB_ENV
-
+        git diff --name-status origin/main | grep ".*\.recipe$" | sed '/^D/d' | grep -v '^R100' | cut -c 3- | sort -u > /tmp/new_recipes.txt
+    - name: List new recipe templates in temp file
+      if: steps.filter.outputs.templates == 'true'
+      run: |
+        git diff --name-status origin/main | grep ".*\.xml" | sed '/^D/d' | grep -v '^R100' | cut -c 3- | sort -u > /tmp/new_templates.txt
+    
+    - name: Validate XML syntax for recipes
+      if: steps.filter.outputs.recipes == 'true'
+      run: |
+        while read recipe; do xmllint --noout "$recipe"; done < <(cat /tmp/new_recipes.txt)
+    - name: Validate XML syntax for recipe templates
+      if: steps.filter.outputs.templates == 'true'
+      run: |
+        while read template; do xmllint --noout "$template"; done < <(cat /tmp/new_templates.txt)
+        
     - name: Install AutoPkg
+      if: steps.filter.outputs.recipes == 'true'
       run: |
-        curl -L https://github.com/autopkg/autopkg/releases/download/v2.1/autopkg-2.1.pkg --output /tmp/autopkg.pkg
+        curl -L https://github.com/autopkg/autopkg/releases/download/v2.3.1/autopkg-2.3.1.pkg --output /tmp/autopkg.pkg
         sudo installer -pkg /tmp/autopkg.pkg -target /
-
     - name: Install JSSImporter
+      if: steps.filter.outputs.recipes == 'true'
       run: |
-        curl -L https://github.com/jssimporter/JSSImporter/releases/download/v1.1.2/jssimporter-1.1.2.pkg --output /tmp/jssimporter.pkg
+        curl -L https://github.com/jssimporter/JSSImporter/releases/download/v1.1.5/jssimporter-1.1.5.pkg --output /tmp/jssimporter.pkg
         sudo installer -pkg /tmp/jssimporter.pkg -target /
-
     - name: Configure AutoPkg
+      if: steps.filter.outputs.recipes == 'true'
       env:
-        JSS_USERNAME: ${{ secrets.JSS_USERNAME }}
-        JSS_PASSWORD: ${{ secrets.JSS_PASSWORD }}
+        JSS_USERNAME: ${{ secrets.JSS_USERNAME_SANDBOX }}
+        JSS_PASSWORD: ${{ secrets.JSS_PASSWORD_SANDBOX }}
         JSS_URL: ${{ secrets.JSS_URL }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         defaults write com.github.autopkg RECIPE_OVERRIDE_DIRS $(pwd)/RecipeOverrides/
         defaults write com.github.autopkg RECIPE_REPO_DIR $(pwd)/repos/
@@ -59,16 +85,18 @@ jobs:
         defaults write com.github.autopkg JSS_URL $JSS_URL
         defaults write com.github.autopkg API_USERNAME $JSS_USERNAME
         defaults write com.github.autopkg API_PASSWORD $JSS_PASSWORD
-
+        defaults write com.github.autopkg GITHUB_TOKEN $GH_TOKEN
     - name: Clone AutoPkg parent repos
+      if: steps.filter.outputs.recipes == 'true'
       run: |
         for repo in $(cat repo_list.txt); do autopkg repo-add $repo && autopkg repo-update $repo; done
-
     - name: Verify trust info
+      if: steps.filter.outputs.recipes == 'true'
       run: |
-        for recipe in "$NEW_RECIPES"; do autopkg verify-trust-info -vv $recipe; done
+        while read recipe; do autopkg verify-trust-info -vv "$recipe"; done < <(cat /tmp/new_recipes.txt)
     
     - name: Run recipes
+      if: steps.filter.outputs.recipes == 'true'
       run: |
-        for recipe in "$NEW_RECIPES"; do autopkg run -vv $recipe --key STOP_IF_NO_JSS_UPLOAD=False; done
+        while read recipe; do autopkg run -vvvv "$recipe" --key STOP_IF_NO_JSS_UPLOAD=False; done < <(cat /tmp/new_recipes.txt)
 
